@@ -25,7 +25,8 @@
 
 ; config statements should precede project file includes.
 #include <xc.inc>
-
+count EQU 0x20 ;use data memory address 0x20 as an 8-bit loop counter 
+ 
 ; Reset Vector at 0000h. Execution starts here after reset.
 PSECT resetVect,class=CODE,delta=2
 ResetVector: 
@@ -70,18 +71,28 @@ Setup:
     
     GOTO Main
     
-    count EQU 0x20 ;use data memory address 0x20 as an 8-bit loop counter  
 
     Main:
-        MOVLW 0x01       ;1 Tcy increment by 1
-        XORWF 0x06,1     ;1 Tcy inverter and increment by 1
-
-        MOVLW 0x0F       ;1 Tcy move W=15 to count
-        MOVWF count      ;1 Tcy make count equal 15
-                         ;Delay loop is equals 44 Tcy when count is 15         
-        DECFSZ count,1   ;1 Tcy if not zero, 2 Tcy if zero
-        GOTO $-1         ;2 Tcy delay runs 15 times before skiping
-
-    GOTO   Main          ;2Tcy
+        BTFSC 0x06,0     ;Test RBO Skip the next like if button is pressed
+	GOTO ButtonUnpressed
+        
+    ButtonPressed:
+        MOVLW 0x01
+	XORWF 0x05,1     ;Toggle RA0
+	CALL Delay       ;2 Tcy call to delay to cause a delay
+	GOTO Main        ;2 Tcy
+	
+    ButtonUnpressed:
+        BCF 0x05,0       ;1 Tcy Force RA0 low - silence
+	GOTO Main        ;2 Tcy
+	
+    Delay:
+        MOVLW 0xA3       ;1 Tcy move W 163 to count
+	MOVWF count      ;1 Tcy make count 163
+	
+    DelayLoop:
+    DECFSZ count,1        ;1 Tcy if not zero, 2 Tcy if zero
+    GOTO DelayLoop       ;2 Tcy runs 163 times before skipping
+    Return               ;2 Tcy return to call
     
     End
