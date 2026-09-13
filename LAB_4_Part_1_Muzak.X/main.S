@@ -1,7 +1,7 @@
     ; Luke Groesbeck
     ; RCET3373
     ; LAB 3
-    ; https://github.com/groeluke/Delays/tree/main/LAB_3_Part_2_Delays.X
+    ; https://github.com/groeluke/Funky-Muzak/tree/main/LAB_4_Part_1_Muzak.X
     
 ; PIC16F883 Configuration Bit Settings
 
@@ -42,11 +42,15 @@ Setup:
     BCF 0x03,6  ;Set Bank 0
     BCF 0x03,5  ;Set Bank 0
     CLRF 0x06   ;Setting PortB on reset low
+    CLRF 0x05   ;Setting PortA on reset low
     
     ;         Bank 1
     BCF 0x03,6  ;Set Bank 1
     BSF 0x03,5  ;Set Bank 1
-    CLRF 0x86   ;Set PortB as an output TRISB
+    MOVLW 0x00
+    MOVWF 0x85  ;TRISA set PortA as outputs
+    MOVLW 0x01
+    MOVWF 0x86  ;TRISB set RB0 as input
     
     ;         Bank 2
     BSF 0x03,6  ;Set Bank 2
@@ -56,7 +60,9 @@ Setup:
     ;         Bank 3
     BSF 0x03,6  ;Set Bank 3
     BSF 0x03,5  ;Set Bank 3
-    CLRF 0x89   ;Setting the I/O to digital ANSELH
+    CLRF 0x88   ;Setting the I/O to digital ANSEL PortA
+    CLRF 0x89   ;Setting the I/O to digital ANSELH PortB
+    
     
     ;Reset to Bank 0
     BCF 0x03,6  ;Set Bank 0
