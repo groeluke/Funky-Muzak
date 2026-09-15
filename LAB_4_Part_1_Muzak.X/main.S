@@ -64,7 +64,6 @@ Setup:
     CLRF 0x88   ;Setting the I/O to digital ANSEL PortA
     CLRF 0x89   ;Setting the I/O to digital ANSELH PortB
     
-    
     ;Reset to Bank 0
     BCF 0x03,6  ;Set Bank 0
     BCF 0x03,5  ;Set Bank 0

@@ -1,0 +1,73 @@
+__S0 0 0 ABS 0
+__S1 0 0 ABS 0
+__S3 0 0 ABS 0
+__Hconfig 2009 0 CONFIG 4
+__Lconfig 0 0 CONFIG 4
+__HresetVect 1 0 CODE 0
+__LresetVect 0 0 CODE 0
+__Hcode 29 0 CODE 0
+__Lcode 8 0 CODE 0
+__Hdata 52 0 ABS 0
+__Ldata 52 0 ABS 0
+__Hudata_bank0 52 0 ABS 0
+__Ludata_bank0 52 0 ABS 0
+__Hudata_shr 52 0 ABS 0
+__Ludata_shr 52 0 ABS 0
+__H__absolute__ 0 0 ABS 0
+__L__absolute__ 0 0 ABS 0
+__Hedata 52 0 ABS 0
+__Ledata 52 0 ABS 0
+__Hudata 52 0 ABS 0
+__Ludata 52 0 ABS 0
+__Hudata_bank1 52 0 ABS 0
+__Ludata_bank1 52 0 ABS 0
+__Hspace_0 52 0 ABS 0
+__Lspace_0 0 0 ABS 0
+__Hspace_1 0 0 ABS 0
+__Lspace_1 0 0 ABS 0
+__Hspace_3 0 0 ABS 0
+__Lspace_3 0 0 ABS 0
+__Hspace_4 4010 0 ABS 0
+__Lspace_4 0 0 ABS 0
+__Hudata_bank2 52 0 ABS 0
+__Ludata_bank2 52 0 ABS 0
+%segments
+resetVect 0 1 CODE 0 0
+code 10 51 CODE 10 0
+%locals
+build/default/production/main.o
+main.S
+43 8 0 CODE 0
+44 9 0 CODE 0
+45 A 0 CODE 0
+46 B 0 CODE 0
+49 C 0 CODE 0
+50 D 0 CODE 0
+51 E 0 CODE 0
+52 F 0 CODE 0
+53 10 0 CODE 0
+54 11 0 CODE 0
+57 12 0 CODE 0
+58 13 0 CODE 0
+59 14 0 CODE 0
+62 15 0 CODE 0
+63 16 0 CODE 0
+64 17 0 CODE 0
+65 18 0 CODE 0
+68 19 0 CODE 0
+69 1A 0 CODE 0
+71 1B 0 CODE 0
+75 1C 0 CODE 0
+76 1D 0 CODE 0
+79 1E 0 CODE 0
+80 1F 0 CODE 0
+81 20 0 CODE 0
+82 21 0 CODE 0
+85 22 0 CODE 0
+86 23 0 CODE 0
+89 24 0 CODE 0
+90 25 0 CODE 0
+93 26 0 CODE 0
+94 27 0 CODE 0
+95 28 0 CODE 0
+33 0 0 CODE 0
