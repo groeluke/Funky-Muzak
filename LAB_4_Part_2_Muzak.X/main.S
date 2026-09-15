@@ -1,7 +1,7 @@
     ; Luke Groesbeck
     ; RCET3373
-    ; First Program
-    ; https://github.com/groeluke/PIC16F883-I-0-Familiarization/tree/main/LAB_2_Part_3_PIC.X
+    ; Funky Muzak Program
+    ; https://github.com/groeluke/Funky-Muzak/tree/main/LAB_4_Part_2_Muzak.X
     
 ; PIC16F883 Configuration Bit Settings
 
@@ -25,7 +25,11 @@
 
 ; config statements should precede project file includes.
 #include <xc.inc>
-
+  
+   indexcount EQU 0x20 ;use data memory address 0x20 as an 8-bit loop counter  
+   outcount EQU 0x21 ;use data memory address 0x21 as an 8-bit loop counter
+   incount EQU 0x22 ;use data memory address 0x22 as an 8-bit loop counter
+ 
 ; Reset Vector at 0000h. Execution starts here after reset.
 PSECT resetVect,class=CODE,delta=2
 ResetVector: 
@@ -38,119 +42,170 @@ PSECT code,class=CODE,delta=2
 Setup:
     ; add device setup here
     
-    ;       Bank 0
+    ;         Bank 0
     BCF 0x03,6  ;Set Bank 0
     BCF 0x03,5  ;Set Bank 0
-    CLRF 0x06   ;Setting PortB on reset low known
-    CLRF 0x07   ;Set PortC on reset to LOW
+    CLRF 0x06   ;Setting PortB on reset low
+    CLRF 0x05   ;Setting PortA on reset low
     
-    ;       Bank 1
+    ;         Bank 1
     BCF 0x03,6  ;Set Bank 1
     BSF 0x03,5  ;Set Bank 1
-    CLRF 0x0B   ;Set INTCON low to remove interrupt flags 
-    CLRF 0x87   ;Set PortC as an Output TRISC
-    MOVLW 0xFF  ;Set TRISB high
-    MOVWF 0x86  ;Set PortB as an Input TRISB  
-    ;       Bank 2
-    ;BSF 0x03,6  ;Set Bank 2
-    ;BCF 0x03,5  ;Set Bank 2
+    MOVLW 0x00
+    MOVWF 0x85  ;TRISA set PortA as outputs
+    MOVLW 0xFF
+    MOVWF 0x86  ;TRISB set PORTB as inputs for dip switches
     
-    ;       Bank 3
+    ;         Bank 2
+    BSF 0x03,6  ;Set Bank 2
+    BCF 0x03,5  ;Set Bank 2
+    BSF 0x09,1  ;Setting Bit 1 High for CM2CON1
+    
+    ;         Bank 3
     BSF 0x03,6  ;Set Bank 3
     BSF 0x03,5  ;Set Bank 3
-    CLRF 0x89   ;Setting the I/O to digital PortB ANSELH
+    CLRF 0x88   ;Setting the I/O to digital ANSEL PortA
+    CLRF 0x89   ;Setting the I/O to digital ANSELH PortB
+    
+    ;Reset to Bank 0
+    BCF 0x03,6  ;Set Bank 0
+    BCF 0x03,5  ;Set Bank 0
     
     GOTO Main
     
     
     Main:
 	; main code goes here
-	BCF 0x03,6     ;Set Bank 0
-	BCF 0x03,5     ;Set Bank 0
+	CALL SelectSwitch  ;Determine which switch is active
 	
+	MOVF indexcount,W  ;Check if no switch is active 
+	BTFSC 0x03,2       ;Check and make RA0 silent
+	GOTO Silent
+	
+        CALL LookUp         ;Call to the Look up table and check which index is selected
+        MOVWF outcount      ;Move the value to outcount for delay to play note
+	
+	CALL Delay          ;Call delay and play frequency for note selected
+	
+	MOVLW 0x01          ;Toggle RA0
+	XORWF 0x05,1        ;Toggle TA0 
+	
+	GOTO Main
+	
+    Silent:
+        BCF 0x05,0          ;Force RA0 low silence
+	GOTO Main
+	
+    SelectSwitch:
 	BTFSS 0x06,7   ;Skip next line if RB7 is set 
-	GOTO Test6     ;If not RB7 keep testing
-	GOTO Display7  ;If RB7 display 7
+	GOTO Test6     ;If not Test the next switch
+	GOTO Set8      ;If RB7 is high got to Set8
 	
 	Test6:
         BTFSS 0x06,6   ;Skip next line if RB6 is set 
-	GOTO Test5     ;If not RB6 keep testing
-	GOTO Display6  ;If RB6 display 6
+	GOTO Test5     ;If not Test the next switch
+	GOTO Set7      ;If RB6 is high got to Set7
 	
 	Test5:
         BTFSS 0x06,5   ;Skip next line if RB5 is set 
-	GOTO Test4     ;If not RB5 keep testing
-	GOTO Display5  ;If RB5 display 5
+	GOTO Test4     ;If not Test the next switch
+	GOTO Set6      ;If RB5 is high got to Set6
 	
 	Test4:
         BTFSS 0x06,4   ;Skip next line if RB4 is set 
-	GOTO Test3     ;If not RB4 keep testing
-	GOTO Display4  ;If RB4 display 4
+	GOTO Test3     ;If not Test the next switch
+	GOTO Set5      ;If RB4 is high got to Set5
 	
 	Test3:
         BTFSS 0x06,3   ;Skip next line if RB3 is set 
-	GOTO Test2     ;If not RB3 keep testing
-	GOTO Display3  ;If RB3 display 3
+	GOTO Test2     ;If not Test the next switch
+	GOTO Set4      ;If RB3 is high got to Set4
 	
 	Test2:
         BTFSS 0x06,2   ;Skip next line if RB2 is set 
-	GOTO Test1     ;If not RB2 keep testing
-	GOTO Display2  ;If RB2 display 2
+	GOTO Test1     ;If not Test the next switch
+	GOTO Set3      ;If RB2 is high got to Set3
 	
 	Test1:
         BTFSS 0x06,1   ;Skip next line if RB1 is set 
-	GOTO Test0     ;If not RB1 keep testing
-	GOTO Display1  ;If RB1 display 1
+	GOTO Test0     ;If not Test the next switch
+	GOTO Set2      ;If RB1 is high got to Set2
 	
 	Test0:
-        BTFSS 0x06,0    ;Skip next line if RB0 is set 
-	GOTO DisplayDal ;If not RB0 Low display $
-	GOTO Display0   ;If RB0 high display 0
+        BTFSS 0x06,0   ;Skip next line if RB0 is set 
+	GOTO NoneSet   ;If not Silence
+	GOTO Set1      ;If RB0 is high got to Set1
 	
-	Display7:
-        MOVLW 0x37     ;Select the character set for display 7
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+	Set8:
+        MOVLW 0x08           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display6:
-        MOVLW 0x36     ;Select the character set for display 6
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set7:
+        MOVLW 0x07           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display5:
-        MOVLW 0x35     ;Select the character set for display 5
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set6:
+        MOVLW 0x06           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display4:
-        MOVLW 0x34     ;Select the character set for display 4
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set5:
+        MOVLW 0x05           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display3:
-        MOVLW 0x33     ;Select the character set for display 3
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set4:
+        MOVLW 0x04           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display2:
-        MOVLW 0x32     ;Select the character set for display 2
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set3:
+        MOVLW 0x03           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display1:    
-        MOVLW 0x31     ;Select the character set for display 1
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+        Set2:    
+        MOVLW 0x02           ;Select the character set for display 1
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-        Display0:
-        MOVLW 0x30     ;Select the character set for display 0
-	MOVWF 0x07     ;Send W to PortC
-	GOTO Main
+	Set1:
+        MOVLW 0x01           ;Move W into indexcount
+	MOVWF indexcount     ;Send W to indextcount for index table
+	RETURN               ;Return the indexcount for index table 
 	
-	DisplayDal:
-        MOVLW 0x24     ;Select the character set for display $
-	MOVWF 0x07     ;Send W to PortC
+        NoneSet:
+        CLRF indexcount      ;Send clear indexcount so no noise is made
+	RETURN               ;Return the indexcount for index table 
+    
+    LookUp:
+        MOVF indexcount,W
+	ADDWF PCL,F - jump into table below
 	
-	GOTO Main
+        RETLW 0x00       ;index 0 Silent
+        RETLW 0xEE       ;index 1 C3
+        RETLW 0xD4       ;index 2 D3
+        RETLW 0xBD       ;index 3 E3
+        RETLW 0xB2       ;index 4 F3
+        RETLW 0x9F       ;index 5 G3
+        RETLW 0x8E       ;index 6 A3
+        RETLW 0x7E       ;index 7 B3
+        RETLW 0x77       ;index 8 C4
+    
+    Delay:
+        OutLoop:
+        MOVLW 4
+        MOVWF incount
+
+        InLoop:
+        DECFSZ incount,1
+        GOTO InLoop
+
+        DECFSZ outcount,1
+        GOTO OutLoop
+    
+    RETURN
 	
     End
