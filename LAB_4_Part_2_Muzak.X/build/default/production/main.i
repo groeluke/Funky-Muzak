@@ -2394,110 +2394,110 @@ Setup:
  CALL SelectSwitch ;Determine which switch is active
 
  MOVF indexcount,W ;Check if no switch is active
- BTFSC 0x03,2
+ BTFSC 0x03,2 ;Check and make ((PORTA) and 07Fh), 0 silent
  GOTO Silent
 
-        CALL LookUp ;Loop up delay value
-        MOVWF outcount
+        CALL LookUp ;Call to the Look up table and check which index is selected
+        MOVWF outcount ;Move the value to outcount for delay to play note
 
- CALL Delay
+ CALL Delay ;Call delay and play frequency for note selected
 
  MOVLW 0x01 ;Toggle ((PORTA) and 07Fh), 0
- XORWF 0x05,1
+ XORWF 0x05,1 ;Toggle TA0
 
  GOTO Main
 
     Silent:
-        BCF 0x05,0
+        BCF 0x05,0 ;Force ((PORTA) and 07Fh), 0 low silence
  GOTO Main
 
     SelectSwitch:
  BTFSS 0x06,7 ;Skip next line if ((PORTB) and 07Fh), 7 is set
- GOTO Test6 ;If not ((PORTB) and 07Fh), 7 keep testing
- GOTO Set8 ;
+ GOTO Test6 ;If not Test the next switch
+ GOTO Set8 ;If ((PORTB) and 07Fh), 7 is high got to Set8
 
  Test6:
         BTFSS 0x06,6 ;Skip next line if ((PORTB) and 07Fh), 6 is set
- GOTO Test5 ;If not ((PORTB) and 07Fh), 6 keep testing
- GOTO Set7 ;
+ GOTO Test5 ;If not Test the next switch
+ GOTO Set7 ;If ((PORTB) and 07Fh), 6 is high got to Set7
 
  Test5:
         BTFSS 0x06,5 ;Skip next line if ((PORTB) and 07Fh), 5 is set
- GOTO Test4 ;If not ((PORTB) and 07Fh), 5 keep testing
- GOTO Set6 ;
+ GOTO Test4 ;If not Test the next switch
+ GOTO Set6 ;If ((PORTB) and 07Fh), 5 is high got to Set6
 
  Test4:
         BTFSS 0x06,4 ;Skip next line if ((PORTB) and 07Fh), 4 is set
- GOTO Test3 ;If not ((PORTB) and 07Fh), 4 keep testing
- GOTO Set5 ;
+ GOTO Test3 ;If not Test the next switch
+ GOTO Set5 ;If ((PORTB) and 07Fh), 4 is high got to Set5
 
  Test3:
         BTFSS 0x06,3 ;Skip next line if ((PORTB) and 07Fh), 3 is set
- GOTO Test2 ;If not ((PORTB) and 07Fh), 3 keep testing
- GOTO Set4 ;
+ GOTO Test2 ;If not Test the next switch
+ GOTO Set4 ;If ((PORTB) and 07Fh), 3 is high got to Set4
 
  Test2:
         BTFSS 0x06,2 ;Skip next line if ((PORTB) and 07Fh), 2 is set
- GOTO Test1 ;If not ((PORTB) and 07Fh), 2 keep testing
- GOTO Set3 ;
+ GOTO Test1 ;If not Test the next switch
+ GOTO Set3 ;If ((PORTB) and 07Fh), 2 is high got to Set3
 
  Test1:
         BTFSS 0x06,1 ;Skip next line if ((PORTB) and 07Fh), 1 is set
- GOTO Test0 ;If not ((PORTB) and 07Fh), 1 keep testing
- GOTO Set2 ;
+ GOTO Test0 ;If not Test the next switch
+ GOTO Set2 ;If ((PORTB) and 07Fh), 1 is high got to Set2
 
  Test0:
         BTFSS 0x06,0 ;Skip next line if ((PORTB) and 07Fh), 0 is set
- GOTO NoneSet ;If not ((PORTB) and 07Fh), 0 Low display
- GOTO Set1 ;
+ GOTO NoneSet ;If not Silence
+ GOTO Set1 ;If ((PORTB) and 07Fh), 0 is high got to Set1
 
  Set8:
-        MOVLW 0x08 ;Select the character set for display 7
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x08 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set7:
-        MOVLW 0x07 ;Select the character set for display 6
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x07 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set6:
-        MOVLW 0x06 ;Select the character set for display 5
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x06 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set5:
-        MOVLW 0x05 ;Select the character set for display 4
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x05 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set4:
-        MOVLW 0x04 ;Select the character set for display 3
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x04 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set3:
-        MOVLW 0x03 ;Select the character set for display 2
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x03 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         Set2:
         MOVLW 0x02 ;Select the character set for display 1
- MOVWF indexcount ;Send W to PortC
- RETURN
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
  Set1:
-        MOVLW 0x01 ;Select the character set for display 0
- MOVWF indexcount ;Send W to PortC
- RETURN
+        MOVLW 0x01 ;Move W into indexcount
+ MOVWF indexcount ;Send W to indextcount for index table
+ RETURN ;Return the indexcount for index table
 
         NoneSet:
-        CLRF indexcount
- RETURN
+        CLRF indexcount ;Send clear indexcount so no noise is made
+ RETURN ;Return the indexcount for index table
 
     LookUp:
         MOVF indexcount,W
-        ADDWF PCL,1 ;ADDWF PCL,F - jump into table below
+ ADDWF PCL,1 ;ADDWF PCL,F - jump into table below
 
         RETLW 0x00 ;index 0 Silent
         RETLW 0xEE ;index 1 C3
@@ -2511,15 +2511,15 @@ Setup:
 
     Delay:
         OutLoop:
-    MOVLW 4
-    MOVWF incount
+        MOVLW 4
+        MOVWF incount
 
-InLoop:
-    DECFSZ incount,1
-    GOTO InLoop
+        InLoop:
+        DECFSZ incount,1
+        GOTO InLoop
 
-    DECFSZ outcount,1
-    GOTO OutLoop
+        DECFSZ outcount,1
+        GOTO OutLoop
 
     RETURN
 

@@ -79,7 +79,7 @@ Setup:
 	CALL SelectSwitch  ;Determine which switch is active
 	
 	MOVF indexcount,W  ;Check if no switch is active 
-	BTFSC 0x03,2       ;Check and make RA0 silent
+	BTFSC indexcount,7 ;
 	GOTO Silent
 	
         CALL LookUp         ;Call to the Look up table and check which index is selected
@@ -177,12 +177,12 @@ Setup:
 	RETURN               ;Return the indexcount for index table 
 	
         NoneSet:
-        CLRF indexcount      ;Send clear indexcount so no noise is made
+        BSF indexcount,7      ;Send clear indexcount so no noise is made
 	RETURN               ;Return the indexcount for index table 
     
     LookUp:
         MOVF indexcount,W
-	ADDWF PCL,F - jump into table below
+	ADDWF PCL,1 ;ADDWF PCL,F - jump into table below
 	
         RETLW 0x00       ;index 0 Silent
         RETLW 0xEE       ;index 1 C3
@@ -196,7 +196,7 @@ Setup:
     
     Delay:
         OutLoop:
-        MOVLW 4
+        MOVLW 0x04
         MOVWF incount
 
         InLoop:
