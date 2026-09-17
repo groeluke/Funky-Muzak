@@ -96,107 +96,141 @@ Setup:
 	GOTO Main
 	
 SelectButton:
-    CLRF highcount ;clear count 
-    CLRF lowcount  ;clear count
-	
+    CLRF highcount
+    CLRF lowcount
     ;   Scan Row 4 (RB3)
-    BCF 0x03,6        ;Set Bank 1
-    BSF 0x03,5        ;Set Bank 1
-    MOVLW 0xF7        ;RB3 output-low, rest input
-    MOVWF 0x86        ;Send W to PortB
-    BCF 0x03,6        ;Set Bank 0
-    BCF 0x03,5        ;Set Bank 0
+    BCF 0x03,6      ;Set Bank 1
+    BSF 0x03,5      ;Set Bank 1
+    MOVLW 0xF7      ;RB3 output-low, rest input
+    MOVWF 0x86      ;Send W to PortB
+    BCF 0x03,6      ;Set Bank 0
+    BCF 0x03,5      ;Set Bank 0
+	
+    BTFSS 0x06,4    ;Check Column 1 for *
+    BSF highcount,6      ;Set test * high if selected
+    BTFSS 0x06,5    ;Check Column 2 for 0
+    BSF lowcount,0      ;Set test 0 high if selected
+    BTFSS 0x06,6    ;Check Column 3 for #
+    BSF highcount,7      ;Set test # high if selected
+    BTFSS 0x06,7    ;Check Column 4 for D
+    BSF highcount,5      ;Set test D high if selected
+	
+    ;   Scan Row 3 (RB2) 
+    BCF 0x03,6      ;Set Bank 1
+    BSF 0x03,5      ;Set Bank 1
+    MOVLW 0xFB      ;RB2 output-low, rest input
+    MOVWF 0x86      ;Send W to PortB
+    BCF 0x03,6      ;Set Bank 0
+    BCF 0x03,5      ;Set Bank 0
 
-    BTFSS 0x06,7      ;Test if D is pressed (Check Column 4)
-    GOTO  TestHash    ;GOTO Test for #
-    GOTO  DisplayD    ;GOTO the Display for D
-TestHash:
-    BTFSS 0x06,6      ;Test if # is pressed (Check Column 3)
-    GOTO  Test0       ;GOTO Test for 0
-    GOTO  DisplayHash ;GOTO the Display for #
-Test0:
-    BTFSS 0x06,5      ;Test if 0 is pressed (Check Column 2)
-    GOTO  TestStar    ;GOTO Test for *
-    GOTO  Display0    ;GOTO the Display for 0
-TestStar:
-    BTFSS 0x06,4      ;Test if * is pressed (Check Column 1)
-    GOTO  Row3        ;GOTO scan Row 3
-    GOTO  DisplayStar ;GOTO the Display for *
-
-    ;   Scan Row 3 (RB2)
-Row3:
-    BCF 0x03,6        ;Set Bank 1
-    BSF 0x03,5        ;Set Bank 1
-    MOVLW 0xFB        ;RB2 output-low, rest input
-    MOVWF 0x86        ;Send W to PortB
-    BCF 0x03,6        ;Set Bank 0
-    BCF 0x03,5        ;Set Bank 0
-
-    BTFSS 0x06,7      ;Test if C is pressed (Check Column 4)
-    GOTO  Test9       ;GOTO Test for 9
-    GOTO  DisplayC    ;GOTO the Display for C
-Test9:
-    BTFSS 0x06,6      ;Test if 9 is pressed (Check Column 3)
-    GOTO  Test8       ;GOTO Test for 8
-    GOTO  Display9    ;GOTO the Display for 9
-Test8:
-    BTFSS 0x06,5      ;Test if 8 is pressed (Check Column 2)
-    GOTO  Test7       ;GOTO Test for 7
-    GOTO  Display8    ;GOTO the Display for 8
-Test7:
-    BTFSS 0x06,4      ;Test if 7 is pressed (Check Column 1)
-    GOTO  Row2        ;GOTO scan Row 2
-    GOTO  Display7    ;GOTO the Display for 7
-
+    BTFSS 0x06,4    ;Check Column 1 for 7
+    BSF lowcount,7      ;Set test 7 high if selected
+    BTFSS 0x06,5    ;Check Column 2 for 8
+    BSF highcount,0      ;Set test 8 high if selected
+    BTFSS 0x06,6    ;Check Column 3 for 9
+    BSF highcount,1      ;Set test 9 high if selected
+    BTFSS 0x06,7    ;Check Column 4 for C
+    BSF highcount,4      ;Set test C high if selected
+	
     ;   Scan Row 2 (RB1)
-Row2:
-    BCF 0x03,6        ;Set Bank 1
-    BSF 0x03,5        ;Set Bank 1
-    MOVLW 0xFD        ;RB1 output-low, rest input
-    MOVWF 0x86        ;Send W to PortB
-    BCF 0x03,6        ;Set Bank 0
-    BCF 0x03,5        ;Set Bank 0
+    BCF 0x03,6      ;Set Bank 1
+    BSF 0x03,5      ;Set Bank 1
+    MOVLW 0xFD      ;RB1 output-low, rest input
+    MOVWF 0x86      ;Send W to PortB
+    BCF 0x03,6      ;Set Bank 0
+    BCF 0x03,5      ;Set Bank 0
 
-    BTFSS 0x06,7      ;Test if B is pressed (Check Column 4)
-    GOTO  Test6       ;GOTO Test for 6
-    GOTO  DisplayB    ;GOTO the Display for B
+    BTFSS 0x06,4    ;Check Column 1 for 4
+    BSF lowcount,4      ;Set test 4 high if selected
+    BTFSS 0x06,5    ;Check Column 2 for 5
+    BSF lowcount,5      ;Set test 5 high if selected
+    BTFSS 0x06,6    ;Check Column 3 for 6
+    BSF lowcount,6      ;Set test 6 high if selected
+    BTFSS 0x06,7    ;Check Column 4 for B
+    BSF highcount,3      ;Set test B high if selected
+	
+    ;    Sacn Row 1 (RB0) 
+    BCF 0x03,6   ;Set Bank 1
+    BSF 0x03,5   ;Set Bank 1
+    MOVLW 0xFE   ;RB0 output is low, RB1-RB7 input
+    MOVWF 0x86   ;Send W to PortB
+    BCF 0x03,6   ;Set Bank 0
+    BCF 0x03,5   ;Set Bank 0
+
+    BTFSS 0x06,4    ;Check Column 1 for 1
+    BSF lowcount,1      ;Set test 1 high if selected
+    BTFSS 0x06,5    ;Check Column 2 for 2
+    BSF lowcount,2      ;Set test 2 high if selected
+    BTFSS 0x06,6    ;Check Column 3 for 3
+    BSF lowcount,3      ;Set test 3 high if selected
+    BTFSS 0x06,7    ;Check Column 4 for A
+    BSF highcount,2      ;Set test A high if selected
+
+    GOTO TestD
+TestD:
+    BTFSS highcount,5    ;Test if D is pressed 
+    GOTO TestHash      ;GOTO Test for #
+    GOTO DisplayD   ;GOTO the Display for D
+TestHash:
+    BTFSS highcount,7    ;Test if # is pressed 
+    GOTO Test0   ;GOTO Test for *
+    GOTO DisplayHash;GOTO the Display for #
+Test0:
+    BTFSS lowcount,0    ;Test if 0 is pressed 
+    GOTO TestStar ;GOTO the Display for *
+    GOTO Display0   ;GOTO the Display for 0
+TestStar:
+    BTFSS highcount,6    ;Test if * is pressed 
+    GOTO TestC      ;GOTO Test for C
+    GOTO DisplayStar;GOTO the Display for * 
+TestC:
+    BTFSS highcount,4    ;Test if C is pressed 
+    GOTO Test9      ;GOTO Test for 9
+    GOTO DisplayC   ;GOTO the Display for C
+Test9:
+    BTFSS highcount,1    ;Test if 9 is pressed 
+    GOTO Test8      ;GOTO Test for 8
+    GOTO Display9   ;GOTO the Display for 9
+Test8:
+    BTFSS highcount,0    ;Test if 8 is pressed 
+    GOTO Test7      ;GOTO Test for 7
+    GOTO Display8   ;GOTO the Display for 8
+Test7:
+    BTFSS lowcount,7    ;Test if 7 is pressed 
+    GOTO TestB      ;GOTO Test for B
+    GOTO Display7   ;GOTO the Display for 7
+TestB:
+    BTFSS highcount,3    ;Test if B is pressed 
+    GOTO Test6      ;GOTO Test for 6
+    GOTO DisplayB   ;GOTO the Display for B
 Test6:
-    BTFSS 0x06,6      ;Test if 6 is pressed (Check Column 3)
-    GOTO  Test5       ;GOTO Test for 5
-    GOTO  Display6    ;GOTO the Display for 6
+    BTFSS lowcount,6    ;Test if 6 is pressed 
+    GOTO Test5      ;GOTO Test for 5
+    GOTO Display6   ;GOTO the Display for 6
 Test5:
-    BTFSS 0x06,5      ;Test if 5 is pressed (Check Column 2)
-    GOTO  Test4       ;GOTO Test for 4
-    GOTO  Display5    ;GOTO the Display for 5
+    BTFSS lowcount,5    ;Test if 5 is pressed 
+    GOTO Test4      ;GOTO Test for 4
+    GOTO Display5   ;GOTO the Display for 5
 Test4:
-    BTFSS 0x06,4      ;Test if 4 is pressed (Check Column 1)
-    GOTO  Row1        ;GOTO scan Row 1
-    GOTO  Display4    ;GOTO the Display for 4
-
-    ;    Scan Row 1 (RB0)
-Row1:
-    BCF 0x03,6        ;Set Bank 1
-    BSF 0x03,5        ;Set Bank 1
-    MOVLW 0xFE        ;RB0 output is low, RB1-RB7 input
-    MOVWF 0x86        ;Send W to PortB
-    BCF 0x03,6        ;Set Bank 0
-    BCF 0x03,5        ;Set Bank 0
-
-    BTFSS 0x06,7      ;Test if A is pressed (Check Column 4)
-    GOTO  Test3       ;GOTO Test for 3
-    GOTO  DisplayA    ;GOTO the Display for A
+    BTFSS lowcount,4    ;Test if 4 is pressed 
+    GOTO TestA      ;GOTO Test for A
+    GOTO Display4   ;GOTO the Display for 4
+TestA:
+    BTFSS highcount,2    ;Test if A is pressed 
+    GOTO Test3      ;GOTO Test for 3
+    GOTO DisplayA   ;GOTO the Display for A
 Test3:
-    BTFSS 0x06,6      ;Test if 3 is pressed (Check Column 3)
-    GOTO  Test2       ;GOTO Test for 2
-    GOTO  Display3    ;GOTO the Display for 3
+    BTFSS lowcount,3    ;Test if 3 is pressed 
+    GOTO Test2      ;GOTO Test for 2
+    GOTO Display3   ;GOTO the Display for 3
 Test2:
-    BTFSS 0x06,5      ;Test if 2 is pressed (Check Column 2)
-    GOTO  Test1       ;GOTO Test for 1
-    GOTO  Display2    ;GOTO the Display for 2
+    BTFSS lowcount,2    ;Test if 2 is pressed 
+    GOTO Test1      ;GOTO Test for 1
+    GOTO Display2   ;GOTO the Display for 2
 Test1:
-    BTFSS 0x06,4      ;Test if 1 is pressed (Check Column 1)
-    GOTO  DisplayDal  ;GOTO the Display for $
-    GOTO  Display1    ;GOTO the Display for 1
+    BTFSS lowcount,1    ;Test if 1 is pressed 
+    GOTO DisplayDal      ;GOTO the Display $
+    GOTO Display1   ;GOTO the Display for 1
     
 DisplayDal:
     MOVLW 0x80
